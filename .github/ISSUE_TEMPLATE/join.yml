@@ -1,0 +1,41 @@
+name: Join Team America
+description: Join with your GitHub username. No admin has to be here.
+title: "ONBOARD: "
+labels: [onboarding]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        You're joining as your GitHub username. Don't type your real name, address, employer or any dollar amounts anywhere in this repo.
+  - type: dropdown
+    id: ai
+    attributes:
+      label: AI
+      options:
+        - Claude (free)
+        - Claude (paid)
+        - ChatGPT
+        - Grok
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: data_rules
+    attributes:
+      label: Data rules
+      options:
+        - label: I read DATA-RULES.md and will never put personal data in this repo.
+          required: true
+  - type: checkboxes
+    id: values
+    attributes:
+      label: Values
+      options:
+        - label: I understand Team America follows the Runtime Republic control documents.
+          required: true
+  - type: checkboxes
+    id: list_me
+    attributes:
+      label: Members list
+      options:
+        - label: OK to list my GitHub username in MEMBERS.md.
