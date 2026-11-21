@@ -1,0 +1,237 @@
+name: Onboard verify
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency: onboard-${{ github.event.issue.number }}
+
+jobs:
+  verify:
+    name: Verify check word
+    if: >-
+      github.event.issue.state == 'open'
+      && github.event.issue.pull_request == null
+      && github.event.comment.user.login == github.event.issue.user.login
+      && contains(github.event.issue.labels.*.name, 'onboarding')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check the comment
+        id: verify
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const logic = require(`${process.env.GITHUB_WORKSPACE}/.github/onboarding/logic.js`);
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const issueNumber = context.payload.issue.number;
+
+            core.setOutput('matched', 'false');
+            core.setOutput('invite', 'false');
+
+            const live = await github.rest.issues.get({
+              owner,
+              repo,
+              issue_number: issueNumber
+            });
+
+            if (live.data.state !== 'open') return;
+            if (live.data.pull_request) return;
+            if (logic.isBot(context.payload.comment.user)) return;
+            if (context.payload.comment.user.login !== live.data.user.login) return;
+            const labels = live.data.labels || [];
+            if (labels.some((label) => label.name === 'onboarded')) return;
+            if (!labels.some((label) => label.name === 'onboarding')) return;
+
+            const onboarding = await github.rest.repos.getContent({
+              owner,
+              repo,
+              path: 'ONBOARDING.md',
+              ref: 'main'
+            });
+            const checkWord = logic.readCheckWord(logic.decodeGithubContent(onboarding.data));
+            if (!checkWord) {
+              core.setFailed('ONBOARDING.md is missing the smoke test check word line');
+              return;
+            }
+
+            const judged = logic.judgeComment(context.payload.comment.body, checkWord);
+            if (judged.action === 'ignore') return;
+
+            if (judged.action === 'mismatch') {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: issueNumber,
+                body: judged.reply
+              });
+              return;
+            }
+
+            let teamName = 'Team America';
+            let teamLead = 'James Hodges';
+            let role = '';
+            try {
+              const settings = await github.rest.repos.getContent({
+                owner,
+                repo,
+                path: '.github/onboarding.json',
+                ref: 'main'
+              });
+              const config = JSON.parse(logic.decodeGithubContent(settings.data));
+              if (typeof config.team_name === 'string' && config.team_name.trim()) {
+                teamName = config.team_name.trim();
+              }
+              if (typeof config.team_lead === 'string' && config.team_lead.trim()) {
+                teamLead = config.team_lead.trim();
+              }
+              if (typeof config.invite_role === 'string') role = config.invite_role.trim();
+            } catch (error) {
+              core.warning('Onboarding settings could not be read. An admin will be asked to send the invite.');
+            }
+
+            const login = live.data.user.login;
+            if (!logic.validLogin(login)) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: issueNumber,
+                body: logic.INVALID_LOGIN_COMMENT
+              });
+              return;
+            }
+
+            const date = logic.chicagoDate();
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: issueNumber,
+              body: logic.ackLine({ login, teamName, teamLead, date })
+            });
+
+            if (logic.parseListMe(live.data.body || '')) {
+              for (let attempt = 0; attempt < 2; attempt += 1) {
+                const members = await github.rest.repos.getContent({
+                  owner,
+                  repo,
+                  path: 'MEMBERS.md',
+                  ref: 'main'
+                });
+                const current = logic.decodeGithubContent(members.data);
+                const next = logic.appendMembersRow(current, login, date);
+                if (next === current) break;
+                try {
+                  await github.rest.repos.createOrUpdateFileContents({
+                    owner,
+                    repo,
+                    path: 'MEMBERS.md',
+                    message: `List ${login} in MEMBERS.md\n\nOnboarding issue #${issueNumber}`,
+                    content: Buffer.from(next, 'utf8').toString('base64'),
+                    sha: members.data.sha,
+                    branch: 'main'
+                  });
+                  break;
+                } catch (error) {
+                  if (logic.httpStatus(error) === 409 && attempt === 0) continue;
+                  throw error;
+                }
+              }
+            }
+
+            core.setOutput('matched', 'true');
+            core.setOutput('login', login);
+            if (logic.roleAllowed(role)) {
+              core.setOutput('invite', 'true');
+              core.setOutput('invite_role', role);
+            }
+
+      - name: Invite collaborator
+        id: invite
+        if: steps.verify.outputs.matched == 'true' && steps.verify.outputs.invite == 'true'
+        continue-on-error: true
+        uses: actions/github-script@v7
+        env:
+          INVITE_LOGIN: ${{ steps.verify.outputs.login }}
+          INVITE_ROLE: ${{ steps.verify.outputs.invite_role }}
+        with:
+          github-token: ${{ secrets.ONBOARD_TOKEN }}
+          script: |
+            const logic = require(`${process.env.GITHUB_WORKSPACE}/.github/onboarding/logic.js`);
+            const login = process.env.INVITE_LOGIN;
+            const role = process.env.INVITE_ROLE;
+            if (!logic.validLogin(login) || !logic.roleAllowed(role)) {
+              throw new Error('Invite was not sent');
+            }
+            await github.rest.repos.addCollaborator({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              username: login,
+              permission: role
+            });
+
+      - name: Finish onboarding
+        if: steps.verify.outputs.matched == 'true'
+        uses: actions/github-script@v7
+        env:
+          INVITE_OUTCOME: ${{ steps.invite.outcome }}
+        with:
+          script: |
+            const logic = require(`${process.env.GITHUB_WORKSPACE}/.github/onboarding/logic.js`);
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const issueNumber = context.payload.issue.number;
+
+            async function ensureLabel(name, color) {
+              try {
+                await github.rest.issues.createLabel({ owner, repo, name, color });
+              } catch (error) {
+                if (logic.httpStatus(error) !== 422) throw error;
+              }
+            }
+
+            if (process.env.INVITE_OUTCOME !== 'success') {
+              await ensureLabel('needs-admin', 'b60205');
+              await github.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number: issueNumber,
+                labels: ['needs-admin']
+              });
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: issueNumber,
+                body: logic.ADMIN_INVITE_COMMENT
+              });
+            }
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: issueNumber,
+              body: logic.ONBOARDED_COMMENT
+            });
+
+            await ensureLabel('onboarded', '0e8a16');
+            await github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number: issueNumber,
+              labels: ['onboarded']
+            });
+            await github.rest.issues.update({
+              owner,
+              repo,
+              issue_number: issueNumber,
+              state: 'closed',
+              state_reason: 'completed'
+            });
