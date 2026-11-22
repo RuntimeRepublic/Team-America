@@ -1,0 +1,8 @@
+week: 2026-W47
+call_sign: Longbow
+seal_version: 1
+sealed_at: 2026-11-22T13:41:35-06:00
+folders: 7
+files: 13
+folder_hashmark: e290042d3fe3d32a7f847fc2a1511747f9b1b8e1b4065641afda431f7d93c831
+packet_sha256: be1869e64e873b29aaa74e900a6a158d4aa6a40c84503383a0e76435a448e507
