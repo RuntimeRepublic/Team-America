@@ -1,82 +1,141 @@
 {
-  "packet_version": "v0",
-  "status": "DRAFT - awaiting Longbow's review; not committed, not pushed",
-  "week": {
-    "start": "2026-11-15",
-    "end": "2026-11-21",
-    "timezone": "America/Chicago"
-  },
-  "member_tier": "paid",
-  "data_as_of": {
-    "plaid_via_chatgpt": "balances: bank synced 2026-11-21 19:43 CST; card A 2026-11-22 07:22 CST; investment account 2026-11-21 03:58 CST [V]; transaction rows through 2026-11-21",
-    "receipts_repo": "last capture 2026-11-17",
-    "pfm_records": "last update 2026-11-17",
-    "payroll_stub": "pay date 2026-11-19 stub on file (pay period 2026-10-30 to 2026-11-12)",
-    "gmail_receipts": "missing - no Receipts label in connected account",
-    "bank_app_screens": "Bank app 2026-11-22 10:01-10:11 CST [V]",
-    "card_statements": "Card A statement closing 2026-10-24; Card B statement closing 2026-11-20 [V]"
-  },
-  "spending_share_by_group": {
-    "_label": "[C] share of closed posted card/bank spending plus documented cash; categories [S] from Longbow 2026-11-22 where answered, else [E]; rounding may not sum to 100",
-    "Family & Personal": 37.4,
-    "LLC paid personally": 17.4,
-    "Food": 13.6,
-    "Housing": 11.5,
-    "Subscriptions & Fun": 10.1,
-    "Giving": 7.8,
-    "Transportation": 1.9,
-    "Taxes & Government Fees": 0.3
-  },
-  "tax_per_100": {
-    "purchase_basis": {
-      "_label": "per $100 of closed spending; only receipt-backed tax lines counted",
-      "federal": null,
-      "state": null,
-      "county": null,
-      "city": null,
-      "school": null,
-      "sales_tax_unsplit": 0.28,
-      "voluntary_tax_lottery": 0.0,
-      "_notes": "Sales tax split by level UNVERIFIED (no official rate check this run). Fuel excise embedded and unitemized [?]. Lottery: no tickets this week [S] (Longbow, 2026-11-22). Haircut receipt shows tax 0.00 [V]."
+  "packet_version": "v1-draft",
+  "status": "DRAFT - reviewed by the member before posting; no names, dollar amounts or account numbers",
+  "member": {
+    "call_sign": "Longbow",
+    "flags": [
+      "KS",
+      "ICT"
+    ],
+    "member_tier": "paid",
+    "closed_week": true,
+    "ce": {
+      "CE1": {
+        "status": "W",
+        "impact": null
+      },
+      "CE2": {
+        "status": "W",
+        "impact": null
+      },
+      "CE3": {
+        "status": "W",
+        "impact": null
+      },
+      "CE4": {
+        "status": "N",
+        "impact": null
+      },
+      "CE5": {
+        "status": "N",
+        "impact": null
+      },
+      "reviewed_by": null
     },
-    "payroll_basis": {
-      "_label": "[V]/[C] per $100 gross pay, from the 2026-11-19 pay stub",
-      "federal_income": 13.13,
-      "federal_social_security": 6.16,
-      "federal_medicare": 1.44,
-      "federal_total": 20.74,
-      "state_income": 5.95,
-      "county": null,
-      "city": null,
-      "school": null
+    "governments_counted": 2,
+    "budget_order": [
+      "Federal",
+      "State",
+      "Local",
+      "Family"
+    ]
+  },
+  "week": {
+    "iso_week": "2026-W47",
+    "close_week": {
+      "start": "2026-11-15",
+      "end": "2026-11-21",
+      "timezone": "America/Chicago"
+    },
+    "spending_share_by_group": {
+      "_label": "[C] share of closed posted card/bank spending plus documented cash; categories [S] from Longbow 2026-11-22 where answered, else [E]; rounding may not sum to 100",
+      "Family & Personal": 37.4,
+      "LLC paid personally": 17.4,
+      "Food": 13.6,
+      "Housing": 11.5,
+      "Subscriptions & Fun": 10.1,
+      "Giving": 7.8,
+      "Transportation": 1.9,
+      "Taxes & Government Fees": 0.3
+    },
+    "tax_per_100": {
+      "purchase_basis": {
+        "_label": "per $100 of closed spending; only receipt-backed tax lines counted",
+        "federal": null,
+        "state": null,
+        "county": null,
+        "city": null,
+        "school": null,
+        "sales_tax_unsplit": 0.28,
+        "voluntary_tax_lottery": 0.0,
+        "_notes": "Sales tax split by level UNVERIFIED (no official rate check this run). Fuel excise embedded and unitemized [?]. Lottery: no tickets this week [S] (Longbow, 2026-11-22). Haircut receipt shows tax 0.00 [V]."
+      },
+      "payroll_basis": {
+        "_label": "[V]/[C] per $100 gross pay, from the 2026-11-19 pay stub",
+        "federal_income": 13.13,
+        "federal_social_security": 6.16,
+        "federal_medicare": 1.44,
+        "federal_total": 20.74,
+        "state_income": 5.95,
+        "county": null,
+        "city": null,
+        "school": null
+      }
+    },
+    "trail_depth": {
+      "sales_tax": "T1",
+      "fuel_excise_federal_and_state": "T0 (paid, amount not itemized)",
+      "federal_income_withholding": "T1",
+      "social_security_and_medicare_withholding": "T1",
+      "kansas_income_withholding": "T1",
+      "voluntary_tax_lottery": "none this week [S]"
+    },
+    "smoke_tests": {
+      "posted_totals_tie_to_plaid": "PASS for savings and checking (Plaid and bank app balances agree; checking differs only by one row that posted after the Plaid sync). Card: implied opening balance [C] still to verify against last week or the statement.",
+      "no_double_counts": "PASS - 5 own-account transfer pairs and 1 card payment pair net to zero and are excluded; 2 receipts matched to card/bank rows, not added again",
+      "every_tax_line_split_or_flagged": "PASS - all receipt tax lines flagged UNVERIFIED for split; unreceipted rows flagged as gaps",
+      "pending_out_of_closed_total": "PASS",
+      "net_pay_ties_to_deposits": "PASS - pay stub net pay equals the two direct deposits"
+    },
+    "late_items_count": 0,
+    "pending_count": 1,
+    "letters_planned": 0
+  },
+  "quality": {
+    "data_as_of": {
+      "plaid_via_chatgpt": "balances: bank synced 2026-11-21 19:43 CST; card A 2026-11-22 07:22 CST; investment account 2026-11-21 03:58 CST [V]; transaction rows through 2026-11-21",
+      "receipts_repo": "last capture 2026-11-17",
+      "pfm_records": "last update 2026-11-17",
+      "payroll_stub": "pay date 2026-11-19 stub on file (pay period 2026-10-30 to 2026-11-12)",
+      "gmail_receipts": "missing - no Receipts label in connected account",
+      "bank_app_screens": "Bank app 2026-11-22 10:01-10:11 CST [V]",
+      "card_statements": "Card A statement closing 2026-10-24; Card B statement closing 2026-11-20 [V]"
+    },
+    "telemetry_gaps": [
+      "A credit card is not linked to Plaid; its charges come only from statements",
+      "Transaction pull omits the line of credit and the three investment/retirement accounts (balances only)",
+      "Most card/bank purchases have no receipt, so their sales tax is unknown",
+      "Receipts cover 5 purchases this week (11/15, 11/17, 11/21); the rest have none",
+      "Gmail Receipts label not found; email receipt check deferred to after this close",
+      "Sales tax split by government level not verified against official rates"
+    ],
+    "open_questions_count": 0,
+    "bbt_idea": "Add 'list accounts with type and last-updated time' to the weekly ChatGPT Plaid prompt so the tie-out smoke test can pass.",
+    "ai_used": {
+      "_label": "[S] AIs that helped with this close; shared so every member sees how the work was done",
+      "tools": [
+        {
+          "service": "Claude",
+          "model": "Opus 5.5",
+          "role": "close-out, workbook, deck, packet and seal scripts"
+        },
+        {
+          "service": "ChatGPT",
+          "model": null,
+          "role": "pulled Plaid balances and transactions (model not recorded)"
+        }
+      ]
     }
   },
-  "trail_depth": {
-    "sales_tax": "T1",
-    "fuel_excise_federal_and_state": "T0 (paid, amount not itemized)",
-    "federal_income_withholding": "T1",
-    "social_security_and_medicare_withholding": "T1",
-    "kansas_income_withholding": "T1",
-    "voluntary_tax_lottery": "none this week [S]"
-  },
-  "telemetry_gaps": [
-    "A credit card is not linked to Plaid; its charges come only from statements",
-    "Transaction pull omits the line of credit and the three investment/retirement accounts (balances only)",
-    "Most card/bank purchases have no receipt, so their sales tax is unknown",
-    "Receipts cover 5 purchases this week (11/15, 11/17, 11/21); the rest have none",
-    "Gmail Receipts label not found; email receipt check deferred to after this close",
-    "Sales tax split by government level not verified against official rates"
-  ],
-  "late_items_count": 0,
-  "pending_count": 1,
-  "smoke_tests": {
-    "posted_totals_tie_to_plaid": "PASS for savings and checking (Plaid and bank app balances agree; checking differs only by one row that posted after the Plaid sync). Card: implied opening balance [C] still to verify against last week or the statement.",
-    "no_double_counts": "PASS - 5 own-account transfer pairs and 1 card payment pair net to zero and are excluded; 2 receipts matched to card/bank rows, not added again",
-    "every_tax_line_split_or_flagged": "PASS - all receipt tax lines flagged UNVERIFIED for split; unreceipted rows flagged as gaps",
-    "pending_out_of_closed_total": "PASS",
-    "net_pay_ties_to_deposits": "PASS - pay stub net pay equals the two direct deposits"
-  },
-  "open_questions_count": 0,
-  "letters_planned": 0,
-  "bbt_idea": "Add 'list accounts with type and last-updated time' to the weekly ChatGPT Plaid prompt so the tie-out smoke test can pass."
+  "notice": "\u00a9 Lean Office Pro LLC \u2014 format is LLC intellectual property until the license plan is settled."
 }
