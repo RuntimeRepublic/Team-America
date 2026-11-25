@@ -14,6 +14,8 @@ Names, initials, addresses, employers, account numbers, dollar amounts, or any s
 | `data/group-counts.csv` | One row per week: team totals and averages only | A team admin, after the week's packets are merged |
 | `data/study/` | Study files each member reviewed and pushed by hand | The member |
 | `MEMBERS.md` | Members who said yes to being listed, and the team's admins | A team admin |
+| `news/goals.md` | Team goals and deadlines | A team admin |
+| Team news issues (`news` label) | Wins, findings and issues, by GitHub username | Any member, with the Team news form |
 | `members/<login>.md` | One file per member: GitHub username, role, join date, AI used, onboarding issue number | The onboarding bot |
 
 ## data/group-counts.csv columns

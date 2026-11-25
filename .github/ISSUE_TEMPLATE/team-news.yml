@@ -1,0 +1,52 @@
+name: Team news
+description: Report a win, a finding or a problem. Takes one minute.
+title: "NEWS: "
+labels: [news]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Short and factual, like a news item. Use your GitHub username, not your real name.
+        No addresses, employers, account numbers or dollar amounts (see DATA-RULES.md).
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      options:
+        - Win - Saturday post done
+        - Win - mid-week post done
+        - Win - other
+        - Finding - something the team should know
+        - Issue - a problem or blocker
+        - Fixed - an issue that is now solved
+    validations:
+      required: true
+  - type: dropdown
+    id: team
+    attributes:
+      label: Team
+      options:
+        - Team America (FairTax)
+        - Kansas property tax elimination
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: One or two sentences. Say where (which group or page) if it was a post.
+    validations:
+      required: true
+  - type: input
+    id: link
+    attributes:
+      label: Link (optional)
+      description: The post, page or source.
+  - type: checkboxes
+    id: data_rules
+    attributes:
+      label: Data rules
+      options:
+        - label: No personal data in this post.
+          required: true
