@@ -7,6 +7,9 @@ How members report wins, findings and problems, so they show up in team reports.
 1. Open [Team news](https://github.com/RuntimeRepublic/Team-America/issues/new?template=team-news.yml).
 2. Pick the type: Saturday post, mid-week post, other win, finding, issue, or fixed.
 3. Write one or two sentences. Add a link if there is one. Submit.
+4. A bot copies it into [team-log.md](team-log.md) within a minute and closes the post.
+   Issues stay open until someone posts them as Fixed. A post with a dollar amount or an
+   account-style number is not logged until it's edited.
 
 That's it. Use your GitHub username. No personal data (see [DATA-RULES.md](../DATA-RULES.md)).
 
@@ -21,4 +24,4 @@ That's it. Use your GitHub username. No personal data (see [DATA-RULES.md](../DA
 | File | Holds |
 |---|---|
 | `goals.md` | Team goals and deadlines, read as the daily goal line |
-| `team-log.md` | PLANNED: one line per news post, written by a GitHub Action |
+| `team-log.md` | One line per news post, written by the News log Action. Edit the post, not this file |
