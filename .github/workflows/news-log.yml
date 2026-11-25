@@ -1,0 +1,117 @@
+name: News log
+
+on:
+  issues:
+    types: [opened, edited, labeled]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency: news-log
+
+jobs:
+  log:
+    name: Copy news post to news/team-log.md
+    if: contains(github.event.issue.labels.*.name, 'news')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log news
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const onboarding = require(`${process.env.GITHUB_WORKSPACE}/.github/onboarding/logic.js`);
+            const news = require(`${process.env.GITHUB_WORKSPACE}/.github/news/logic.js`);
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const issue = context.payload.issue;
+            const issueNumber = issue.number;
+            const action = context.payload.action;
+
+            if (onboarding.isBot(issue.user)) return;
+            if (action === 'labeled' && context.payload.label.name !== 'news') return;
+
+            const login = issue.user.login;
+            const body = issue.body || '';
+            const hasLabel = (name) => issue.labels.some((l) => l.name === name);
+
+            async function ensureLabel(name, color) {
+              try {
+                await github.rest.issues.createLabel({ owner, repo, name, color });
+              } catch (error) {
+                if (onboarding.httpStatus(error) !== 422) throw error;
+              }
+            }
+
+            // Data rules check: never log a post that looks like it has personal data.
+            if (news.hasPersonalData(`${issue.title}\n${body}`)) {
+              await ensureLabel('needs-edit', 'b60205');
+              if (!hasLabel('needs-edit')) {
+                await github.rest.issues.addLabels({ owner, repo, issue_number: issueNumber, labels: ['needs-edit'] });
+                await github.rest.issues.createComment({ owner, repo, issue_number: issueNumber, body: news.BLOCKED_COMMENT });
+              }
+              return;
+            }
+            if (hasLabel('needs-edit')) {
+              await github.rest.issues.removeLabel({ owner, repo, issue_number: issueNumber, name: 'needs-edit' });
+            }
+
+            const item = news.parseNews(body);
+            const line = news.logLine({
+              date: news.issueDate(issue.created_at),
+              news: item,
+              login,
+              issueNumber
+            });
+
+            // Write the line, retrying if another post wrote the file at the same moment.
+            let written = false;
+            for (let attempt = 1; attempt <= 4 && !written; attempt++) {
+              let current = '';
+              let sha;
+              try {
+                const res = await github.rest.repos.getContent({ owner, repo, path: news.LOG_PATH, ref: 'main' });
+                current = onboarding.decodeGithubContent(res.data);
+                sha = res.data.sha;
+              } catch (error) {
+                if (onboarding.httpStatus(error) !== 404) throw error;
+              }
+              const updated = news.upsertLine(current, line, issueNumber);
+              if (updated === null) return; // already logged, nothing changed
+              try {
+                await github.rest.repos.createOrUpdateFileContents({
+                  owner,
+                  repo,
+                  path: news.LOG_PATH,
+                  message: `News log: #${issueNumber} (${item.type})`,
+                  content: Buffer.from(updated, 'utf8').toString('base64'),
+                  sha,
+                  branch: 'main'
+                });
+                written = true;
+              } catch (error) {
+                const status = onboarding.httpStatus(error);
+                if (status !== 409 && status !== 422) throw error;
+                await new Promise((r) => setTimeout(r, 1500 * attempt));
+              }
+            }
+            if (!written) throw new Error('Could not write news/team-log.md after 4 tries');
+
+            if (action === 'opened' || action === 'labeled') {
+              const keepOpen = item.type === 'issue';
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: issueNumber,
+                body: keepOpen
+                  ? 'Logged in news/team-log.md. This stays open until someone posts it as Fixed.'
+                  : 'Logged in news/team-log.md. Thanks! Closing this post; edit it any time and the log line updates.'
+              });
+              if (!keepOpen) {
+                await github.rest.issues.update({ owner, repo, issue_number: issueNumber, state: 'closed', state_reason: 'completed' });
+              }
+            }
