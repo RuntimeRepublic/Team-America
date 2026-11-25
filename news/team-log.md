@@ -9,4 +9,4 @@ Types: `win-sat` Saturday post · `win-mid` mid-week post · `win` other win ·
 `finding` · `issue` open problem · `fixed` solved problem
 
 ## Log
-- 2026-11-25 | win-sat | Team America (FairTax) | @jhodges07 | To do I recieve a letter from the state. I will post it into the system this week. | - | #6
+- 2026-11-25 | finding | Team America (FairTax) | @jhodges07 | Today I received a letter from the state. I will post it into the system this week. | - | #6
