@@ -1,6 +1,6 @@
 # Work cards
 
-Register for this repository. Card IDs: TA-CWC-NNN. Next free number: TA-CWC-005.
+Register for this repository. Card IDs: TA-CWC-NNN. Next free number: TA-CWC-006.
 
 | ID | Task | Review owner | Agent | Status |
 |---|---|---|---|---|
@@ -8,3 +8,4 @@ Register for this repository. Card IDs: TA-CWC-NNN. Next free number: TA-CWC-005
 | TA-CWC-002 | Team news: news form, news/goals.md, news/README.md | James | Claude | In review |
 | TA-CWC-003 | News log Action: copy each news post to news/team-log.md | James | Claude | In review |
 | TA-CWC-004 | Open letters: card form, letters folder, AI rules, log Action, membership check, join section, start and issue cards | Claude | Team America 01 | In review |
+| TA-CWC-005 | Open letters fixes: DATA-RULES letters exception, README table heading, blob links, card IDs | Claude | Team America 01 | In review |

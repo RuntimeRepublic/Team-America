@@ -24,11 +24,13 @@ Steps: [letters/README.md](letters/README.md)
 
 ## How to join for Elected Office Holders
 
-1. See the letters to your office ([letters/offices/](letters/offices/)).
+1. See the letters to your office ([letters/offices/](letters/offices/)) (appears after the first letter is logged).
 2. Claim your office page: email from an official .gov address, or a link from your official website.
 3. Reply in the open on the card.
 4. Join the national team; your Congressional team is the members in your district plus your office.
 5. Check your own ethics rules first.
+
+## What's in this repository
 
 | Path | Holds |
 |---|---|

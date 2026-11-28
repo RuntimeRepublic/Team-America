@@ -12,7 +12,7 @@ The work order gives the wording below and does not give offices, official sourc
 
 ## LTR-START
 
-Title: `LTR: Write your members of Congress`
+Title: `LTR: LTR-START Write your members of Congress`
 
 Labels: `letter-card`
 
@@ -26,7 +26,7 @@ Write your members of Congress. A start card for new members such as FAIRTaxFran
 
 ## LTR-0001
 
-Title: `LTR: Audit the Social Security liability.`
+Title: `LTR: LTR-0001 Audit the Social Security liability`
 
 Labels: `letter-card`, `focus: social-security`
 
@@ -36,7 +36,7 @@ Audit the Social Security liability.
 
 ## LTR-0002
 
-Title: `LTR: Index Social Security to gold.`
+Title: `LTR: LTR-0002 Index Social Security to gold`
 
 Labels: `letter-card`, `focus: social-security`
 
@@ -46,7 +46,7 @@ Index Social Security to gold.
 
 ## LTR-0003
 
-Title: `LTR: Separate Social Security payments not based on input over the years, by the end of February.`
+Title: `LTR: LTR-0003 Separate Social Security payments not based on input over the years, by the end of February`
 
 Labels: `letter-card`, `focus: social-security`
 
@@ -56,7 +56,7 @@ Separate Social Security payments not based on input over the years, by the end 
 
 ## LTR-0004
 
-Title: `LTR: Waste, fraud and abuse is not an enumerated power.`
+Title: `LTR: LTR-0004 Waste, fraud and abuse is not an enumerated power`
 
 Labels: `letter-card`
 
@@ -68,7 +68,7 @@ Waste, fraud and abuse is not an enumerated power.
 
 ## LTR-0005
 
-Title: `LTR: Defense reports by logical size nodes by the end of May; nodes flagged May 1 need a recovery plan by the end of May, or they are done.`
+Title: `LTR: LTR-0005 Defense reports by logical size nodes by the end of May; nodes flagged May 1 need a recovery plan by the end of May, or they are done`
 
 Labels: `letter-card`, `focus: department-of-war`
 
@@ -78,7 +78,7 @@ Defense reports by logical size nodes by the end of May; nodes flagged May 1 nee
 
 ## LTR-0006
 
-Title: `LTR: Enforce the NBBF by the end of January: the Secretary of War first, then all four branches present their NBBF.`
+Title: `LTR: LTR-0006 Enforce the NBBF by the end of January: the Secretary of War first, then all four branches present their NBBF`
 
 Labels: `letter-card`, `focus: department-of-war`
 

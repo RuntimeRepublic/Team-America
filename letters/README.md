@@ -13,9 +13,11 @@ Open letters stay in this repository. Personal letters you don't want open belon
 
 The three files in step 5 are `letter.md`, `letter.jpg` and `envelope.jpg`. The folder also needs `meta.yml`, described below, or the letter is not listed in the log.
 
-Warning: the photos show your name and signature, and often your home address. Crop them if you don't want that public.
+Crop or cover your return address and any phone number before uploading. Your name and signature may stay.
 
 ## Where the files go
+
+The card ID is in the title (LTR-####). Use it for your folder name; use the issue number <n> only in the footer's 'This issue' link.
 
 One folder per card, member and office:
 
