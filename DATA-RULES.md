@@ -6,6 +6,8 @@ This repository is public. It holds group information only.
 
 Names, initials, addresses, employers, account numbers, dollar amounts, or any single bill or receipt. A pull request that contains one is not merged; the member fixes it and sends it again.
 
+Exception — letters/: a member's own name and signature on their own open letter, by their choice. Home addresses, phone numbers and account numbers are never allowed there either; crop or cover the return address before uploading.
+
 ## What goes where
 
 | Path | Holds | Who writes it |
@@ -17,6 +19,8 @@ Names, initials, addresses, employers, account numbers, dollar amounts, or any s
 | `news/goals.md` | Team goals and deadlines | A team admin |
 | Team news issues (`news` label) | Wins, findings and issues, by GitHub username | Any member, with the Team news form |
 | `members/<login>.md` | One file per member: GitHub username, role, join date, AI used, onboarding issue number | The onboarding bot |
+| `letters/LTR-####/<login>/<office-slug>/` | One open letter: letter.md, letter.jpg, envelope.jpg, reply files, meta.yml (no home address, phone or account numbers) | The member, by pull request |
+| `letters/log.csv`, `letters/offices/` | Letter log and office pages, rebuilt automatically | The letters-log Action |
 
 ## data/group-counts.csv columns
 

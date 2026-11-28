@@ -1,0 +1,56 @@
+name: Letter card
+description: Open one letter, FOIA request, open-records request or public comment. One issue only.
+title: "LTR: "
+labels: [letter-card]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        One issue only. No street addresses, phone numbers or personal figures (see DATA-RULES.md).
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      description: Letter, FOIA request, open-records request or public comment.
+      options:
+        - Letter
+        - FOIA request
+        - Open-records request
+        - Public comment
+    validations:
+      required: true
+  - type: input
+    id: issue
+    attributes:
+      label: The one issue
+      description: One issue only.
+      placeholder: One issue only
+    validations:
+      required: true
+  - type: textarea
+    id: ask
+    attributes:
+      label: The ask and its deadline
+      description: What the letter asks for, and the date it is due.
+    validations:
+      required: true
+  - type: textarea
+    id: offices
+    attributes:
+      label: Offices to receive it
+      description: Any government office.
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Official sources
+      description: Links to official pages.
+    validations:
+      required: true
+  - type: textarea
+    id: controls
+    attributes:
+      label: AGCL controls it rests on
+    validations:
+      required: true

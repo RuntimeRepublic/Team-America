@@ -1,0 +1,121 @@
+name: Letters membership check
+
+# Comment and label only. Does not check out the pull request and does not fail the check.
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'letters/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  check:
+    name: Member file
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment if the author has no member file
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const pull = context.payload.pull_request;
+            const issueNumber = pull.number;
+            const login = pull.user && pull.user.login;
+
+            function statusOf(error) {
+              return error && (error.status || (error.response && error.response.status));
+            }
+
+            function validLogin(name) {
+              return typeof name === 'string'
+                && name.length >= 1
+                && name.length <= 39
+                && /^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9]))*$/.test(name);
+            }
+
+            async function ensureLabel(name, color) {
+              try {
+                await github.rest.issues.createLabel({ owner, repo, name, color });
+              } catch (error) {
+                if (statusOf(error) !== 422) throw error;
+              }
+            }
+
+            const memberPath = validLogin(login) ? `members/${login}.md` : '';
+            let onBase = false;
+            if (memberPath) {
+              try {
+                await github.rest.repos.getContent({
+                  owner,
+                  repo,
+                  path: memberPath,
+                  ref: pull.base.sha
+                });
+                onBase = true;
+              } catch (error) {
+                if (statusOf(error) !== 404) throw error;
+              }
+            }
+
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner,
+              repo,
+              pull_number: issueNumber,
+              per_page: 100
+            });
+            const change = memberPath ? files.find((file) => file.filename === memberPath) : null;
+            const added = change && change.status !== 'removed';
+            const removed = change && change.status === 'removed';
+            const hasMember = Boolean(added || (onBase && !removed));
+
+            if (hasMember) {
+              try {
+                await github.rest.issues.removeLabel({
+                  owner,
+                  repo,
+                  issue_number: issueNumber,
+                  name: 'needs-member-file'
+                });
+              } catch (error) {
+                if (statusOf(error) !== 404) throw error;
+              }
+              return;
+            }
+
+            await ensureLabel('needs-member-file', 'fbca04');
+            await github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number: issueNumber,
+              labels: ['needs-member-file']
+            });
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number: issueNumber,
+              per_page: 100
+            });
+            const marker = '<!-- needs-member-file -->';
+            if (comments.some((comment) => (comment.body || '').includes(marker))) return;
+
+            const onboarding = `https://github.com/${owner}/${repo}/blob/main/ONBOARDING.md`;
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: issueNumber,
+              body: [
+                `This pull request changes \`letters/\` and @${login} has no \`${memberPath || 'members/<login>.md'}\`.`,
+                '',
+                `Onboarding: ${onboarding}`,
+                '',
+                'This does not block the pull request. The label `needs-member-file` was added.',
+                '',
+                marker
+              ].join('\n')
+            });
