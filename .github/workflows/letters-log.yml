@@ -1,0 +1,39 @@
+name: Letters log
+
+on:
+  push:
+    paths:
+      - 'letters/**'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: letters-log-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  log:
+    name: Rebuild log and office pages
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Rebuild letters log and office pages
+        run: node .github/letters/build.js
+
+      - name: Commit rebuilt files
+        run: |
+          tracked=$(git ls-files -- letters/log.csv letters/offices)
+          if [ -e letters/log.csv ] || [ -d letters/offices ] || [ -n "$tracked" ]; then
+            git add -A -- letters/log.csv letters/offices
+          fi
+          if git diff --cached --quiet; then
+            echo "No letter log changes"
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -m "Rebuild letters log and office pages"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
